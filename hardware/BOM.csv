@@ -1,0 +1,15 @@
+item,qty,unit_inr,total_inr,source,price_status
+ESP32 30-pin CP2102 dev board,1,499,499,Probots,checked Oct 2026
+27 mm piezo disc (5 used + 1 spare),6,20,120,Probots,checked Oct 2026
+LM324 quad op-amp (band-pass x5),2,15,30,Ritchie Street,estimate
+LM339 quad comparator (x5),2,15,30,Ritchie Street,estimate
+"Resistors, capacitors, 1N4148 clamps, 5 trimpots, perfboard, headers",1,100,100,Ritchie Street,estimate
+BMP280 module (GY-BMP280),1,150,150,Ritchie Street (Probots 299),estimate
+Aluminium sheet: 1 mm 300x300 wall + 0.5 mm 300x150 bumper,1,250,250,Ritchie Street / hardware shop,estimate
+Plastic storage container ~8 L,1,100,100,local,estimate
+M-seal epoxy putty,1,60,60,local,estimate
+Fevikwik (bond piezos),2,10,20,local,estimate
+Tubeless tyre valve stem,1,40,40,cycle shop,estimate
+"M3 standoffs, screws, rubber feet",1,50,50,Ritchie Street,estimate
+Steel balls (calibration drops),1,30,30,cycle shop,estimate
+TOTAL,,,1479,,
