@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HULLSENSE CAD model</title>
+<style>
+  :root{--ink:#16141f;--mute:#5b5770;--line:#dcd8e6;--acc:#5b2bd6;--bg:#f7f6fb}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:Inter,"Segoe UI",Roboto,sans-serif;color:var(--ink);background:var(--bg)}
+  header{padding:18px 24px 10px;display:flex;flex-wrap:wrap;gap:12px;align-items:baseline;justify-content:space-between}
+  h1{font-size:22px;margin:0} .sub{color:var(--mute);font-size:14px}
+  nav a{color:var(--acc);font-weight:600;text-decoration:none;margin-right:14px;font-size:14px}
+  #wrap{position:relative;margin:0 24px;height:min(70vh,640px);background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  #view{width:100%;height:100%;display:block}
+  .bar{position:absolute;top:12px;left:12px;display:flex;gap:8px;flex-wrap:wrap}
+  .bar button{font:600 13px Inter,sans-serif;border:1px solid var(--line);background:#fff;border-radius:8px;padding:7px 12px;cursor:pointer}
+  .bar button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .hint{position:absolute;bottom:10px;right:14px;font-size:12px;color:var(--mute)}
+  #load{position:absolute;inset:0;display:grid;place-items:center;color:var(--mute);font-size:14px}
+  main{max-width:1100px;margin:0 auto;padding:20px 24px 48px}
+  h2{font-size:18px;margin:26px 0 10px;border-bottom:2px solid var(--acc);padding-bottom:4px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}
+  figure{margin:0;background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px}
+  figure img{width:100%;display:block} figcaption{font-size:13px;color:var(--mute);margin-top:6px}
+  table{border-collapse:collapse;width:100%;font-size:14px;background:#fff}
+  td,th{border:1px solid var(--line);padding:7px 10px;text-align:left} th{background:#16141f;color:#fff}
+  a{color:var(--acc)}
+  @media (max-width:600px){#wrap{margin:0 16px;height:60vh} header,main{padding-left:16px;padding-right:16px}}
+</style>
+</head>
+<body>
+<header>
+  <div><h1>HULLSENSE test rig: CAD model</h1><div class="sub">Parametric CadQuery model · all dimensions in mm · Team BYTEMELATER</div></div>
+  <nav><a href="../index.html">← Build brief</a><a href="../dashboard/index.html">Dashboard</a><a href="https://github.com/yogeesh2007-bit/hullsense/tree/main/hardware/cad">Source</a></nav>
+</header>
+<div id="wrap">
+  <canvas id="view"></canvas>
+  <div id="load">Loading 3D model…</div>
+  <div class="bar"><button id="bA" class="on">Assembled</button><button id="bE">Exploded</button><button id="bS">Spin</button></div>
+  <div class="hint">Drag to rotate · scroll to zoom · right-drag to pan</div>
+</div>
+<main>
+  <h2>Views</h2>
+  <div class="grid">
+    <figure><img src="rig_exploded_labelled.png" alt="Exploded view of the rig with labelled parts"><figcaption>Exploded view: bumper, standoffs, pressure wall with breach ports, piezos, seal, sealed box, analog board and ESP32.</figcaption></figure>
+    <figure><img src="rig_assembled.png" alt="Assembled rig"><figcaption>Assembled rig on its base board, electronics alongside the sealed box.</figcaption></figure>
+    <figure><img src="wall_underside_sensors.png" alt="Underside of the wall plate showing piezo positions"><figcaption>Underside of the wall: P1–P4 at 20 mm from each corner, matching the solver's sensor map.</figcaption></figure>
+    <figure><a href="hullsense_rig_drawing.pdf"><img src="hullsense_rig_drawing.png" alt="Dimensioned drawing"></a><figcaption>Dimensioned A3 drawing with section A–A and parts list (click for PDF).</figcaption></figure>
+  </div>
+  <h2>Downloads</h2>
+  <table>
+    <tr><th>File</th><th>Use it for</th></tr>
+    <tr><td><a href="https://github.com/yogeesh2007-bit/hullsense/raw/main/hardware/cad/hullsense_rig.step">hullsense_rig.step</a></td><td>Full coloured assembly for Fusion 360, SolidWorks, FreeCAD or Onshape</td></tr>
+    <tr><td><a href="hullsense_rig.glb">hullsense_rig.glb</a> · <a href="hullsense_rig_exploded.glb">exploded</a></td><td>Web, Blender, PowerPoint 3D models</td></tr>
+    <tr><td><a href="https://github.com/yogeesh2007-bit/hullsense/tree/main/hardware/cad/stl">stl/</a></td><td>Wall plate, bumper, box, standoff and base board as separate meshes</td></tr>
+    <tr><td><a href="hullsense_rig_drawing.pdf">hullsense_rig_drawing.pdf</a></td><td>Workshop drawing: cut the plates, drill the ports, place the sensors</td></tr>
+    <tr><td><a href="https://github.com/yogeesh2007-bit/hullsense/blob/main/hardware/cad/hullsense_rig.py">hullsense_rig.py</a></td><td>Change any dimension and regenerate everything: <code>python3 hardware/cad/hullsense_rig.py</code></td></tr>
+  </table>
+</main>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"}}</script>
+<script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+const canvas = document.getElementById('view'), wrap = document.getElementById('wrap');
+const renderer = new THREE.WebGLRenderer({canvas, antialias:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.shadowMap.enabled = true;
+const scene = new THREE.Scene(); scene.background = new THREE.Color(0xffffff);
+scene.environment = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(), 0.04).texture;
+const sun = new THREE.DirectionalLight(0xffffff, 1.5); sun.position.set(-250, 700, 450); sun.castShadow = true;
+sun.shadow.mapSize.set(2048, 2048); Object.assign(sun.shadow.camera, {left:-500, right:500, top:500, bottom:-500, far:2000});
+scene.add(sun, new THREE.HemisphereLight(0xffffff, 0x8899aa, 0.6));
+const gnd = new THREE.Mesh(new THREE.PlaneGeometry(4000, 4000), new THREE.ShadowMaterial({opacity:0.15}));
+gnd.rotation.x = -Math.PI / 2; gnd.position.y = -11.5; gnd.receiveShadow = true; scene.add(gnd);
+const cam = new THREE.PerspectiveCamera(30, 1, 1, 20000);
+const ctl = new OrbitControls(cam, canvas); ctl.enableDamping = true;
+
+const looks = {
+  wall_plate_1mm_Al:{color:0xc9ced6, metalness:0.85, roughness:0.32},
+  bumper_0p5mm_Al:{color:0xa594f0, metalness:0.55, roughness:0.35, transparent:true, opacity:0.82},
+  sealed_box_8L:{color:0xcfdcec, roughness:0.15, transparent:true, opacity:0.42},
+  piezo_P1_P4_brass:{color:0xd4a64a, metalness:0.9, roughness:0.3}, piezo_P5_brass:{color:0xd4a64a, metalness:0.9, roughness:0.3},
+  standoffs_M3x15:{color:0xd9b85c, metalness:0.9, roughness:0.3}, foil_patches:{color:0xeeeeef, metalness:0.95, roughness:0.2},
+  base_board:{color:0xd8b98e, roughness:0.85}, esp32_module:{color:0xbfc3c8, metalness:0.9, roughness:0.25},
+};
+const cache = {}; let current = null, first = true;
+function prep(root){
+  root.traverse(o => {
+    if (!o.isMesh) return;
+    const lk = looks[o.name] || looks[o.parent?.name];
+    o.material = new THREE.MeshStandardMaterial(Object.assign({color:o.material.color.clone(), metalness:0.1, roughness:0.6, side:THREE.DoubleSide}, lk || {}));
+    if (o.material.transparent) o.material.depthWrite = false;
+    o.castShadow = !(lk && lk.opacity < 0.5); o.receiveShadow = true;
+  });
+  return root;
+}
+function show(file){
+  const go = root => {
+    if (current) scene.remove(current);
+    current = root; scene.add(root);
+    if (first) {
+      const b = new THREE.Box3().setFromObject(root), c = b.getCenter(new THREE.Vector3()), r = b.getSize(new THREE.Vector3()).length() / 2;
+      ctl.target.copy(c); cam.position.copy(c).add(new THREE.Vector3(0.62, 0.55, 0.95).normalize().multiplyScalar(r * 2.6)); first = false;
+    }
+    document.getElementById('load').style.display = 'none';
+  };
+  if (cache[file]) return go(cache[file]);
+  new GLTFLoader().load(file, g => { cache[file] = prep(g.scene); go(cache[file]); },
+    undefined, () => { document.getElementById('load').textContent = 'Could not load the model. Download the files below instead.'; });
+}
+const bA = document.getElementById('bA'), bE = document.getElementById('bE'), bS = document.getElementById('bS');
+bA.onclick = () => { show('hullsense_rig.glb'); bA.classList.add('on'); bE.classList.remove('on'); };
+bE.onclick = () => { show('hullsense_rig_exploded.glb'); bE.classList.add('on'); bA.classList.remove('on'); };
+bS.onclick = () => { ctl.autoRotate = !ctl.autoRotate; bS.classList.toggle('on', ctl.autoRotate); };
+function resize(){ const w = wrap.clientWidth, h = wrap.clientHeight; renderer.setSize(w, h, false); cam.aspect = w / h; cam.updateProjectionMatrix(); }
+addEventListener('resize', resize); resize();
+show('hullsense_rig.glb');
+renderer.setAnimationLoop(() => { ctl.update(); renderer.render(scene, cam); });
+</script>
+</body>
+</html>

@@ -9,6 +9,7 @@ When debris hits a space-station wall, the crew needs three answers fast: *where
 - 📄 **Build brief and documentation:** https://yogeesh2007-bit.github.io/hullsense/
 - 🖥️ **Live dashboard** (simulation mode works without hardware): https://yogeesh2007-bit.github.io/hullsense/dashboard/
 - 🔧 **Firmware:** [`firmware/hullsense_node`](firmware/hullsense_node)
+- 📐 **CAD model:** [`hardware/cad`](hardware/cad) (STEP assembly, STL parts, dimensioned drawing); interactive viewer at `docs/cad/`
 
 ![Dashboard in simulation mode](docs/dashboard_screenshot.png)
 
@@ -28,7 +29,8 @@ When debris hits a space-station wall, the crew needs three answers fast: *where
 firmware/hullsense_node/   ESP32 firmware (Arduino-ESP32 3.x)
 docs/                      GitHub Pages site: build brief + live dashboard
 docs/dashboard/            Web Serial dashboard (index.html, app.js, solver.js)
-hardware/                  BOM, wiring, one-channel schematic, rig drawing
+hardware/                  BOM, wiring, one-channel schematic
+hardware/cad/              Parametric CadQuery model: STEP, GLB, STL, A3 drawing, renders
 analysis/                  Python model: decay curves, hole sizing, flight scaling
 tests/                     Solver tests on simulated strikes (node tests/solver.test.js)
 ```
@@ -48,6 +50,19 @@ See [`hardware/BOM.csv`](hardware/BOM.csv) and [`hardware/wiring.md`](hardware/w
 | BMP280 SDA / SCL | GPIO 21 / 22 |
 
 ![One channel](hardware/schematic_channel.png)
+
+## CAD model
+
+![Exploded CAD view](hardware/cad/renders/rig_exploded_labelled.png)
+
+`hardware/cad/hullsense_rig.py` is a parametric CadQuery model of the whole rig. Every dimension lives at the top of the file, and the sensor positions match `solver.js`. Run `pip install cadquery && python3 hardware/cad/hullsense_rig.py && python3 hardware/cad/drawing.py` to regenerate:
+
+| File | What it is |
+|---|---|
+| `hullsense_rig.step` | Coloured assembly for Fusion 360, SolidWorks, FreeCAD or Onshape |
+| `hullsense_rig.glb`, `hullsense_rig_exploded.glb` | Web and Blender versions (used by the viewer in `docs/cad/`) |
+| `stl/*.stl` | Wall plate, bumper, box, standoff and base board as separate parts |
+| `hullsense_rig_drawing.pdf` | A3 workshop drawing: wall layout, section A–A and parts list |
 
 ## Build and flash the firmware
 

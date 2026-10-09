@@ -48,7 +48,7 @@ svg text{font-family:Inter,"DejaVu Sans",sans-serif}
 <!-- ============ PAGE 1: VERDICT ============ -->
 <div class="kicker">SEDHACKS '26 · Team BYTEMELATER · Team lead: Yogeeshwaran C · Rajalakshmi Engineering College</div>
 <h1>HULLSENSE</h1>
-<div class="links"><a href="https://github.com/yogeesh2007-bit/hullsense">GitHub repository</a><a href="dashboard/index.html">Live dashboard (simulation + USB)</a><a href="https://github.com/yogeesh2007-bit/hullsense/tree/main/firmware/hullsense_node">Firmware</a><a href="HULLSENSE_SEDHACKS26.pdf">Pitch deck (PDF)</a></div>
+<div class="links"><a href="https://github.com/yogeesh2007-bit/hullsense">GitHub repository</a><a href="dashboard/index.html">Live dashboard (simulation + USB)</a><a href="https://github.com/yogeesh2007-bit/hullsense/tree/main/firmware/hullsense_node">Firmware</a><a href="cad/index.html">CAD model (3D)</a><a href="HULLSENSE_SEDHACKS26.pdf">Pitch deck (PDF)</a></div>
 <div class="sub">A ₹1,479 sensor skin for a crewed-module wall. When something strikes it, the system works out in seconds whether the shield absorbed it or the pressure wall was hit. If the wall is leaking, it finds where, estimates the hole size, and says how long the crew has.</div>
 
 <div class="box hl">
@@ -223,6 +223,10 @@ For a ~91 m³ module (BAS-01-class, approximate), the time until the module lose
 <p class="small"><b>Timeline:</b> 0–6 h integrate the pre-built pieces · 6–12 h calibrate and test triage · 12–18 h breach loop + dashboard polish · 18–21 h full rehearsals with error logging · 21–24 h slides, sleep, buffer. <b>Fallback ladder:</b> exact localisation → k-NN fingerprint → zone classifier. The breach loop is independent of these, so if localisation drops to zone level the demo still holds.</p>
 
 <!-- ============ SOFTWARE ============ -->
+<h2>CAD model of the test rig</h2>
+<p>The whole bench rig is modelled parametrically in CadQuery (<a href="https://github.com/yogeesh2007-bit/hullsense/tree/main/hardware/cad">hardware/cad</a>). One Python file holds every dimension, so the 3D model, the STEP file, the STL parts and the workshop drawing always agree with each other and with the sensor map the solver uses. <a href="cad/index.html">Open the interactive 3D viewer</a>, or download the <a href="https://github.com/yogeesh2007-bit/hullsense/raw/main/hardware/cad/hullsense_rig.step">STEP assembly</a> and the <a href="cad/hullsense_rig_drawing.pdf">dimensioned drawing (PDF)</a>.</p>
+<img src="cad/rig_exploded_labelled.png" alt="Exploded CAD view of the HULLSENSE rig with labelled parts" style="width:100%;border:1px solid #dcd8e6;border-radius:8px;margin:6px 0 4px">
+
 <h2>Firmware and dashboard</h2>
 <p><b>Firmware</b> (<a href="https://github.com/yogeesh2007-bit/hullsense/tree/main/firmware/hullsense_node">firmware/hullsense_node</a>): Arduino-ESP32 3.x sketch. Five MCPWM capture channels timestamp comparator edges at 12.5 ns; edges within 2 ms form one strike event; a 30 ms hold-off ignores ringing; the BMP280 streams box pressure at about 100 samples per second; a heartbeat reports per-channel edge counts so a dead sensor shows up as a fault. Builds for the ESP32 Dev Module with Arduino-ESP32 3.0.7 (317 KB flash, 21 KB RAM).</p>
 <p><b>Dashboard</b> (<a href="dashboard/index.html">open it here</a>): runs in Chrome or Edge and talks to the node over Web Serial. It runs the 5-tap calibration, locates strikes by least squares on the arrival times, decides the verdict, fits the pressure decay for the hole diameter and scales it to a station-class module. A clearly labelled simulation mode lets anyone try it without hardware.</p>
