@@ -16,7 +16,11 @@ piezo ─┬─ 1 MΩ to GND (bleed)
 LM324 out ─ LM339 (+);  LM339 (−) ← threshold trimpot
 LM339 out ─ 10 kΩ pull-up to 3V3 ─ ESP32 capture pin
 ```
-Vref = 3V3 divided by two 10 kΩ resistors, decoupled with 10 µF. Power the LM324/LM339 from 3V3 so every output stays within ESP32 limits.
+Vref = 3V3 divided by two 10 kΩ resistors, decoupled with 10 µF.
+
+**Power the LM324 and LM339 from the ESP32's 5 V (VIN) pin, not 3V3.** On a 3.3 V supply the LM324 output can only rise to about 1.8 V, which leaves just 0.15 V of swing above the 1.65 V reference. On 5 V it can reach about 3.5 V. This is still safe for the ESP32: the LM339 has open-collector outputs, and its 10 kΩ pull-ups go to **3V3**, so the capture pins never see more than 3.3 V. Put a 100 nF decoupling capacitor on each IC.
+
+Unused sections: on the spare LM324 op-amps, tie (+) to Vref and the output to (−). On the spare LM339 comparators, tie both inputs to GND.
 
 ## Pins
 | Signal | GPIO |
