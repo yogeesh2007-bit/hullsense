@@ -48,7 +48,7 @@ svg text{font-family:Inter,"DejaVu Sans",sans-serif}
 <!-- ============ PAGE 1: VERDICT ============ -->
 <div class="kicker">SEDHACKS '26 · Team BYTEMELATER · Team lead: Yogeeshwaran C · Rajalakshmi Engineering College</div>
 <h1>HULLSENSE</h1>
-<div class="links"><a href="https://github.com/yogeesh2007-bit/hullsense">GitHub repository</a><a href="dashboard/">Live dashboard (simulation + USB)</a><a href="https://github.com/yogeesh2007-bit/hullsense/tree/main/firmware/hullsense_node">Firmware</a><a href="HULLSENSE_SEDHACKS26.pdf">Pitch deck (PDF)</a></div>
+<div class="links"><a href="https://github.com/yogeesh2007-bit/hullsense">GitHub repository</a><a href="dashboard/index.html">Live dashboard (simulation + USB)</a><a href="https://github.com/yogeesh2007-bit/hullsense/tree/main/firmware/hullsense_node">Firmware</a><a href="HULLSENSE_SEDHACKS26.pdf">Pitch deck (PDF)</a></div>
 <div class="sub">A ₹1,479 sensor skin for a crewed-module wall. When something strikes it, the system works out in seconds whether the shield absorbed it or the pressure wall was hit. If the wall is leaking, it finds where, estimates the hole size, and says how long the crew has.</div>
 
 <div class="box hl">
@@ -225,7 +225,7 @@ For a ~91 m³ module (BAS-01-class, approximate), the time until the module lose
 <!-- ============ SOFTWARE ============ -->
 <h2>Firmware and dashboard</h2>
 <p><b>Firmware</b> (<a href="https://github.com/yogeesh2007-bit/hullsense/tree/main/firmware/hullsense_node">firmware/hullsense_node</a>): Arduino-ESP32 3.x sketch. Five MCPWM capture channels timestamp comparator edges at 12.5 ns; edges within 2 ms form one strike event; a 30 ms hold-off ignores ringing; the BMP280 streams box pressure at about 100 samples per second; a heartbeat reports per-channel edge counts so a dead sensor shows up as a fault. Builds for the ESP32 Dev Module with Arduino-ESP32 3.0.7 (317 KB flash, 21 KB RAM).</p>
-<p><b>Dashboard</b> (<a href="dashboard/">open it here</a>): runs in Chrome or Edge and talks to the node over Web Serial. It runs the 5-tap calibration, locates strikes by least squares on the arrival times, decides the verdict, fits the pressure decay for the hole diameter and scales it to a station-class module. A clearly labelled simulation mode lets anyone try it without hardware.</p>
+<p><b>Dashboard</b> (<a href="dashboard/index.html">open it here</a>): runs in Chrome or Edge and talks to the node over Web Serial. It runs the 5-tap calibration, locates strikes by least squares on the arrival times, decides the verdict, fits the pressure decay for the hole diameter and scales it to a station-class module. A clearly labelled simulation mode lets anyone try it without hardware.</p>
 <img src="dashboard_screenshot.png" alt="HULLSENSE dashboard in simulation mode showing a breach verdict" style="width:100%;border:1px solid #dcd8e6;border-radius:8px;margin:6px 0 4px">
 <p class="small mute">Dashboard running in simulation mode (synthetic strikes). The solver test suite in <code>tests/</code> checks calibration, localisation and hole sizing against simulated data.</p>
 
