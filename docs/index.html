@@ -65,16 +65,16 @@ svg text{font-family:Inter,"DejaVu Sans",sans-serif}
 <h2>1 · The problem</h2>
 <p>Crewed modules get struck by micrometeoroids and debris. Today, finding out <b>where</b> a strike hit, <b>whether</b> it breached the pressure wall, and <b>how bad</b> the leak is takes hours to months.</p>
 <div class="grid2">
-<div class="box"><b>ISS Zvezda, 2019–2020</b><br>The leak was noticed in 2019. The crew finally found the crack in 2020 by releasing <b>tea leaves</b> and watching where they drifted. NASA's Inspector General later rated the Zvezda leak at its highest risk level.</div>
-<div class="box"><b>Shenzhou-20, Nov 2025</b><br>Debris cracked the capsule's window while it was docked to Tiangong. Officials said "<i>it is unclear when the damage occurred</i>". The capsule was declared unsafe and the crew came home in a different vehicle.</div>
-<div class="box"><b>Soyuz MS-22, Dec 2022</b><br>Coolant leaked through a hole of about 0.8 mm, attributed to a likely micrometeoroid. It was found only after crew saw particles spraying out, then located using camera inspection.</div>
+<div class="box"><b><a href="https://www.universetoday.com/articles/the-crew-of-the-iss-has-found-the-source-of-the-stations-air-leak">ISS Zvezda, 2019–2020</a></b><br>The leak was noticed in 2019. The crew finally found the crack in 2020 by releasing <b>tea leaves</b> and watching where they drifted. NASA's Inspector General later rated the Zvezda leak at its highest risk level.</div>
+<div class="box"><b><a href="https://www.theregister.com/2025/11/14/shenzhou20_astronauts_return/">Shenzhou-20, Nov 2025</a></b><br>Debris cracked the capsule's window while it was docked to Tiangong. Officials said "<i>it is unclear when the damage occurred</i>". The capsule was declared unsafe and the crew came home in a different vehicle.</div>
+<div class="box"><b><a href="https://spacepolicyonline.com/news/roscosmos-to-decide-next-week-if-soyuz-ms-22-is-safe-enough/">Soyuz MS-22, Dec 2022</a></b><br>Coolant leaked through a hole of about 0.8 mm, attributed to a likely micrometeoroid. It was found only after crew saw particles spraying out, then located using camera inspection.</div>
 <div class="box"><b>ISS, 2004</b><br>"Astronauts on the ISS determined that there was an air leak, and they worked for <b>several days</b> before locating it."</div>
 </div>
 <h3>What exists today, and the gap</h3>
 <table>
 <tr><th>System</th><th>What it does</th><th>What it can't do</th></tr>
 <tr><td>NASA DIDS (Distributed Impact Detection System), ISS / BEAM module</td><td>Piezo accelerometers on the wall detect impacts</td><td>Telling whether the strike breached the wall needs "separate analysis"; it does not size leaks</td></tr>
-<tr><td>NASA HDU piezo-polymer test (2010)</td><td>Detected 147/147 impacts and located each within 8 cm</td><td>Localisation only, using lab-grade data acquisition</td></tr>
+<tr><td><a href="https://acoustics.org/pressroom/httpdocs/161st/Corsaro.html">NASA HDU piezo-polymer test (2010)</a></td><td>Detected 147/147 impacts and located each within 8 cm</td><td>Localisation only, using lab-grade data acquisition</td></tr>
 <tr><td>Honeywell depressurisation analyser (US 6,885,967)</td><td>Estimates hole size and time-to-critical-pressure from dP/dt and compartment volume</td><td>Says only <i>which compartment</i> is leaking, not where on the wall</td></tr>
 <tr><td>Industrial acoustic-emission sensors</td><td>Lab-grade impact sensing</td><td>₹21k–₹3.4 lakh <i>per sensor</i> (Robu.in listings)</td></tr>
 <tr><td>Hobby tap-locators (TapTDOA, MIT knock tracking)</td><td>Locate a finger tap</td><td>No shield/hull distinction, no energy estimate, no breach logic</td></tr>
@@ -244,19 +244,19 @@ For a ~91 m³ module (BAS-01-class, approximate), the time until the module lose
 <!-- ============ SOURCES ============ -->
 <h2>8 · Sources</h2>
 <ol class="small">
-<li>Wells &amp; Madaras, "The Potential for Health Monitoring in Expandable Space Modules: BEAM on the ISS", NASA, 2017: ntrs.nasa.gov/api/citations/20170008538/downloads/20170008538.pdf</li>
-<li>NASA structural health monitoring / DIDS overview, NTRS 20140011091: ntrs.nasa.gov/api/citations/20140011091/downloads/20140011091.pdf</li>
-<li>Corsaro et al., NASA HDU impact detection (147/147, ±8 cm; 2004 ISS leak took days): acoustics.org/pressroom/httpdocs/161st/Corsaro.html</li>
-<li>Rachlin (Honeywell), US 6,885,967 B2 "Spacecraft depressurization analyzer", 2005: patents.google.com/patent/US6885967</li>
-<li>The Register, Shenzhou-20 crew return after debris damage, 14 Nov 2025: theregister.com/2025/11/14/shenzhou20_astronauts_return/</li>
-<li>ScienceAlert, ISS crew use tea leaves to find leak, 2020: sciencealert.com/iss-crew-just-used-floating-tea-leaves-to-find-an-elusive-air-leak</li>
-<li>Universe Today, ISS leak source found, 2020: universetoday.com/148443/the-crew-of-the-iss-has-found-the-source-of-the-stations-air-leak</li>
-<li>Fox 35 / AP, Soyuz MS-22 leak likely caused by micrometeorite, 2022: fox35orlando.com/news/russian-space-capsule-leak-iss-likely-caused-by-micrometeorite</li>
-<li>TapTDOA (hobby prior art), Hackaday.io: hackaday.io/project/159821-taptdoa</li>
-<li>Espressif ESP-IDF MCPWM capture documentation: docs.espressif.com/projects/esp-idf/en/stable/esp32/api-reference/peripherals/mcpwm.html</li>
-<li>Robu.in acoustic-emission sensor listings (price comparison): robu.in/product-category/acoustic-emission-sensors/</li>
+<li>Wells &amp; Madaras, "The Potential for Health Monitoring in Expandable Space Modules: BEAM on the ISS", NASA, 2017: <a href="https://ntrs.nasa.gov/api/citations/20170008538/downloads/20170008538.pdf">ntrs.nasa.gov/api/citations/20170008538/downloads/20170008538.pdf</a></li>
+<li>NASA structural health monitoring / DIDS overview, NTRS 20140011091: <a href="https://ntrs.nasa.gov/api/citations/20140011091/downloads/20140011091.pdf">ntrs.nasa.gov/api/citations/20140011091/downloads/20140011091.pdf</a></li>
+<li>Corsaro et al., NASA HDU impact detection (147/147, ±8 cm; 2004 ISS leak took days): <a href="https://acoustics.org/pressroom/httpdocs/161st/Corsaro.html">acoustics.org/pressroom/httpdocs/161st/Corsaro.html</a></li>
+<li>Rachlin (Honeywell), US 6,885,967 B2 "Spacecraft depressurization analyzer", 2005: <a href="https://patents.google.com/patent/US6885967">patents.google.com/patent/US6885967</a></li>
+<li>The Register, Shenzhou-20 crew return after debris damage, 14 Nov 2025: <a href="https://theregister.com/2025/11/14/shenzhou20_astronauts_return/">theregister.com/2025/11/14/shenzhou20_astronauts_return/</a></li>
+<li>ScienceAlert, ISS crew use tea leaves to find leak, 2020: <a href="https://sciencealert.com/iss-crew-just-used-floating-tea-leaves-to-find-an-elusive-air-leak">sciencealert.com/iss-crew-just-used-floating-tea-leaves-to-find-an-elusive-air-leak</a></li>
+<li>Universe Today, ISS leak source found, 2020: <a href="https://universetoday.com/148443/the-crew-of-the-iss-has-found-the-source-of-the-stations-air-leak">universetoday.com/148443/the-crew-of-the-iss-has-found-the-source-of-the-stations-air-leak</a></li>
+<li>Fox 35 / AP, Soyuz MS-22 leak likely caused by micrometeorite, 2022: <a href="https://fox35orlando.com/news/russian-space-capsule-leak-iss-likely-caused-by-micrometeorite">fox35orlando.com/news/russian-space-capsule-leak-iss-likely-caused-by-micrometeorite</a></li>
+<li>TapTDOA (hobby prior art), Hackaday.io: <a href="https://hackaday.io/project/159821-taptdoa">hackaday.io/project/159821-taptdoa</a></li>
+<li>Espressif ESP-IDF MCPWM capture documentation: <a href="https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-reference/peripherals/mcpwm.html">docs.espressif.com/projects/esp-idf/en/stable/esp32/api-reference/peripherals/mcpwm.html</a></li>
+<li>Robu.in acoustic-emission sensor listings (price comparison): <a href="https://robu.in/product-category/acoustic-emission-sensors/">robu.in/product-category/acoustic-emission-sensors/</a></li>
 <li>Probots: ESP32 30-pin (₹499), 27 mm piezo (₹20), BMP280 (₹299), checked 6 Oct 2026</li>
-<li>Bharatiya Antariksh Station overview: en.wikipedia.org/wiki/Bharatiya_Antariksh_Station</li>
+<li>Bharatiya Antariksh Station overview: <a href="https://en.wikipedia.org/wiki/Bharatiya_Antariksh_Station">en.wikipedia.org/wiki/Bharatiya_Antariksh_Station</a></li>
 </ol>
 <p class="small mute">Physics numbers (decay times, C<sub>d</sub> sensitivity, flight scaling) were computed for this brief. Accuracy targets are goals until the 8–11 Oct bench tests. Put only measured numbers on slide 4.</p>
 </body></html>
