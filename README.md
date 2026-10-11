@@ -37,7 +37,7 @@ tests/                     Solver tests on simulated strikes (node tests/solver.
 
 ## Hardware
 
-See [`hardware/BOM.csv`](hardware/BOM.csv) and [`hardware/wiring.md`](hardware/wiring.md).
+See [`hardware/BOM.csv`](hardware/BOM.csv) (costs), [`hardware/shopping_list.md`](hardware/shopping_list.md) (exact parts and quantities) and [`hardware/wiring.md`](hardware/wiring.md).
 
 | Signal | ESP32 pin |
 |---|---|
