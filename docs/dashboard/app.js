@@ -51,6 +51,7 @@ function onMessage(m, raw) {
 }
 function handleMessage(m) {
   dbgMessage(m);
+  lvMessage(m);
   if (m.t === "p") onPressure(m.us / 1e6, m.pa);
   else if (m.t === "evt") onEvent(m);
   else if (m.t === "hb") { S.bmpOk = !!m.bmp; drawSensors(); }
@@ -572,6 +573,68 @@ $("replayFile").addEventListener("change", (e) => { const f = e.target.files && 
 $("btnReplayStop").onclick = () => endReplay("stopped");
 recRefresh();
 
+// ---------------- direct mode: live signal card ----------------
+// Direct-mode firmware (piezos straight into the ESP32) adds "lv" level messages, "pk" in events, mode/th/base in hello and
+// loop_us in hb. Nothing here touches the solver, calibration or triage. Simulation never shows this card (no fake ADC values).
+S.lv = { direct: false, v: [0, 0, 0, 0, 0], base: [0, 0, 0, 0, 0], th: null, at: 0, loopUs: null };
+const adcVolts = (counts) => (Math.max(0, counts) * 3.3) / 4095;
+
+function lvMessage(m) {          // every message that reaches handleMessage(): live or replayed
+  const L = S.lv;
+  if (m.t === "hello") {
+    L.direct = m.mode === "direct";
+    if (L.direct) {
+      if (Array.isArray(m.base) && m.base.length === 5) L.base = m.base.slice();
+      if (Number.isFinite(m.th)) { L.th = m.th; $("lvTh").value = m.th; }
+    }
+  } else if (m.t === "hb") {
+    if (m.mode === "direct") L.direct = true;
+    if (Number.isFinite(m.loop_us)) L.loopUs = m.loop_us;
+  } else if (m.t === "lv") {
+    if (!Array.isArray(m.v) || m.v.length !== 5) return;
+    L.direct = true; L.v = m.v; L.at = performance.now();
+    if (Array.isArray(m.base) && m.base.length === 5) L.base = m.base;
+    if (Number.isFinite(m.th) && m.th !== L.th) { L.th = m.th; if (document.activeElement !== $("lvTh")) $("lvTh").value = m.th; }
+  } else if (m.t === "ack" && m.cmd === "TH" && Number.isFinite(m.th)) {
+    L.th = m.th; $("lvTh").value = m.th; $("lvThMsg").textContent = "threshold set: " + m.th;
+  } else return;
+  lvRender();
+}
+function lvRender() {
+  const L = S.lv, fresh = performance.now() - L.at < 1000;        // bars fall to zero when levels stop arriving
+  const thV = L.th == null ? null : adcVolts(L.th);
+  for (let i = 0; i < 5; i++) {
+    const volts = fresh ? adcVolts(L.v[i] - (L.base[i] || 0)) : 0, fill = $(`lvFill${i + 1}`), mark = $(`lvMark${i + 1}`);
+    fill.style.width = Math.min(100, (volts / 3.3) * 100) + "%";
+    fill.classList.toggle("over", thV != null && volts > thV);     // red while above the threshold marker
+    $(`lvVal${i + 1}`).textContent = volts.toFixed(2) + " V";
+    mark.style.display = thV == null ? "none" : "block"; mark.style.left = thV == null ? "0" : (thV / 3.3) * 100 + "%";
+  }
+  $("lvTiming").textContent = L.loopUs == null ? "Timing step: –" : `Timing step ≈ ${L.loopUs.toFixed(1)} µs (direct mode)`;
+}
+function lvTick() {              // visibility, badge, decay and control state
+  const L = S.lv, src = !!(S.live || S.replay);
+  if (!src || S.sim) L.direct = false;
+  const show = L.direct && src && !S.sim;
+  $("liveCard").classList.toggle("hidden", !show);
+  $("directBadge").classList.toggle("hidden", !show);
+  const canSend = !!(S.live && S.port) && !S.replay;
+  $("lvTh").disabled = $("btnLvSet").disabled = !canSend;
+  if (show) lvRender();
+}
+async function lvSetThreshold() {
+  const n = parseInt($("lvTh").value, 10), msg = (t) => { $("lvThMsg").textContent = t; };
+  if (!(n >= 20 && n <= 4095)) return msg("enter a threshold from 20 to 4095");
+  if (S.replay) return msg("not available during replay");
+  if (!S.live || !S.port) return msg("not connected");
+  try { await sendLine("TH " + n); dbgLine("> TH " + n, ""); msg(`sent TH ${n}, waiting for the board`); }
+  catch (e) { msg("send failed: " + e.message); }
+}
+$("btnLvSet").onclick = lvSetThreshold;
+$("lvTh").addEventListener("keydown", (e) => { if (e.key === "Enter") lvSetThreshold(); });
+setInterval(lvTick, 100);
+lvTick();
+
 // ---------------- debug panel ----------------
 // Hardware bring-up helpers: last event timing, per-channel edge rates, channel check, raw console, BMP280 status.
 const CH = ["P1", "P2", "P3", "P4", "P5"];
@@ -622,7 +685,7 @@ function dbgHeartbeat(m) {
 }
 function dbgLine(text, tag) {
   const d = S.dbg;
-  if (d.paused || ($("dbgHideP").checked && text.startsWith('{"t":"p"'))) return;
+  if (d.paused || ($("dbgHideP").checked && text.startsWith('{"t":"p"')) || ($("dbgHideLv").checked && text.startsWith('{"t":"lv"'))) return;
   d.lines.push(`${new Date().toISOString().slice(11, 23)} ${tag}${text.length > 220 ? text.slice(0, 220) + "…" : text}`);
   if (d.lines.length > 30) d.lines.shift();
   dbgSchedule();
@@ -633,12 +696,15 @@ function dbgRender() {
   if ($("debug").open === false) return;
   const d = S.dbg;
   $("dbgSrc").textContent = d.evt ? `Last event (${d.src})` : "No event yet";
+  const hasPk = !!(d.evt && Array.isArray(d.evt.pk));
+  $("dbgPkHead").classList.toggle("hidden", !hasPk);
   $("dbgRows").innerHTML = CH.map((n, i) => {
     const r = d.evt ? d.evt.rise[i] : 0, f = d.evt ? d.evt.fall[i] : 0, fired = r > 0;
     const arr = fired ? (((r - d.ref) | 0) / 80).toFixed(1) : "–", tot = fired && f > 0 ? (((f - r) | 0) / 80).toFixed(1) : "–";
     const cnt = d.edges ? d.edges[i] : "–", rate = d.rates[i] == null ? "–" : d.rates[i].toFixed(1);
     return `<tr class="${fired && i === d.first ? "first" : ""} ${d.noisy[i] ? "noisy" : ""}"><td>${n}</td><td>${d.evt ? (fired ? "yes" : "no") : "–"}</td>` +
-      `<td>${arr}</td><td>${tot}</td><td>${cnt}</td><td>${rate}${d.noisy[i] ? " noise" : ""}</td></tr>`;
+      `<td>${arr}</td><td>${tot}</td><td>${cnt}</td><td>${rate}${d.noisy[i] ? " noise" : ""}</td>` +
+      (hasPk ? `<td>${adcVolts(d.evt.pk[i] - (S.lv.base[i] || 0)).toFixed(2)}</td>` : "") + "</tr>";
   }).join("");
   const tm = $("dbgTestMsg");
   tm.textContent = d.test !== null ? `Tap ${CH[d.test]} now…` : d.testMsg; tm.className = "small " + (d.testOk ? "g" : d.test === null && d.testMsg ? "r" : "");
@@ -655,6 +721,10 @@ function dbgStatus() {         // BMP280 and pressure freshness; runs twice a se
   $("dbgPWarn").classList.toggle("hidden", !(active && age > 2000));
   $("dbgPWarn").textContent = `⚠ no pressure message for ${(age / 1000).toFixed(0)} s`;
 }
+async function sendLine(cmd) {     // the one serial writer: PING, SYNC and TH <n> all go through here
+  const w = S.port.writable.getWriter();
+  try { await w.write(new TextEncoder().encode(cmd + "\n")); } finally { w.releaseLock(); }
+}
 async function dbgSend() {
   const cmd = $("dbgCmd").value.trim().toUpperCase(), msg = (t) => { $("dbgCmdMsg").textContent = t; };
   if (cmd !== "PING" && cmd !== "SYNC") return msg("only PING or SYNC");
@@ -662,8 +732,7 @@ async function dbgSend() {
   if (S.sim) return msg("simulation: there is no node to send to");
   if (!S.live || !S.port) return msg("not connected");
   try {
-    const w = S.port.writable.getWriter();
-    await w.write(new TextEncoder().encode(cmd + "\n")); w.releaseLock();
+    await sendLine(cmd);
     dbgLine("> " + cmd, ""); msg("sent " + cmd);
   } catch (e) { msg("send failed: " + e.message); }
 }

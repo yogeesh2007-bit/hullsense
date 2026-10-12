@@ -13,6 +13,7 @@
     <button id="btnConnect">Connect node (USB)</button>
     <button id="btnSim" class="ghost">Simulation</button>
     <span id="status" class="pill">disconnected</span>
+    <span id="directBadge" class="direct hidden">DIRECT MODE: piezos wired straight to the ESP32, no amplifier boards</span>
     <button id="btnDemo" class="ghost">Demo mode (D)</button><button id="btnMute" class="ghost">🔇 Muted</button>
     <span id="recBadge" class="rec hidden"></span>
   </div>
@@ -29,6 +30,19 @@
   </section>
 
   <section class="right">
+    <div class="card hidden" id="liveCard">
+      <h3>Live signal (real ADC values)</h3>
+      <div class="lvrow"><span>P1</span><div class="lvbar"><div class="lvfill" id="lvFill1"></div><div class="lvmark" id="lvMark1"></div></div><b class="lvval" id="lvVal1">0.00 V</b></div>
+      <div class="lvrow"><span>P2</span><div class="lvbar"><div class="lvfill" id="lvFill2"></div><div class="lvmark" id="lvMark2"></div></div><b class="lvval" id="lvVal2">0.00 V</b></div>
+      <div class="lvrow"><span>P3</span><div class="lvbar"><div class="lvfill" id="lvFill3"></div><div class="lvmark" id="lvMark3"></div></div><b class="lvval" id="lvVal3">0.00 V</b></div>
+      <div class="lvrow"><span>P4</span><div class="lvbar"><div class="lvfill" id="lvFill4"></div><div class="lvmark" id="lvMark4"></div></div><b class="lvval" id="lvVal4">0.00 V</b></div>
+      <div class="lvrow"><span>P5</span><div class="lvbar"><div class="lvfill" id="lvFill5"></div><div class="lvmark" id="lvMark5"></div></div><b class="lvval" id="lvVal5">0.00 V</b></div>
+      <p class="small">Bars show the peak level above baseline over the last 50 ms. The amber marker is the trigger threshold.</p>
+      <p class="small" id="lvTiming">Timing step: –</p>
+      <div class="row"><label class="small">Threshold (ADC counts, 20 to 4095) <input id="lvTh" type="number" min="20" max="4095" step="1" disabled></label>
+        <button id="btnLvSet" class="ghost" disabled>Set</button><span class="small" id="lvThMsg"></span></div>
+    </div>
+
     <div id="verdict" class="verdict idle">
       <div class="vt" id="vTitle">Waiting for a strike</div>
       <div class="vs" id="vSub">Connect the node, calibrate with 5 taps, then strike the panel.</div>
@@ -141,7 +155,7 @@
       <summary><h3 style="display:inline">Debug · hardware team</h3></summary>
       <p class="small" id="dbgSrc">No event yet</p>
       <table>
-        <thead><tr><th>ch</th><th>fired</th><th>arrival (µs)</th><th>ToT (µs)</th><th>edges</th><th>edges/s</th></tr></thead>
+        <thead><tr><th>ch</th><th>fired</th><th>arrival (µs)</th><th>ToT (µs)</th><th>edges</th><th>edges/s</th><th id="dbgPkHead" class="hidden">peak (V)</th></tr></thead>
         <tbody id="dbgRows"></tbody>
       </table>
       <p class="small">Arrival is relative to the first sensor to fire (ticks ÷ 80). A channel turns red if it exceeds 5 edges/s with no strike in the last two heartbeats.</p>
@@ -159,6 +173,7 @@
       <div class="row">
         <button id="btnDbgPause" class="ghost">Pause</button>
         <label class="small"><input id="dbgHideP" type="checkbox" checked> hide pressure lines</label>
+        <label class="small"><input id="dbgHideLv" type="checkbox" checked> hide live-level lines</label>
         <input id="dbgCmd" type="text" placeholder="PING or SYNC" style="width:110px"><button id="btnDbgSend" class="ghost">Send</button>
         <span id="dbgCmdMsg" class="small"></span>
       </div>

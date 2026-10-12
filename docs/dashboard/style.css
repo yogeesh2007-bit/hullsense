@@ -76,3 +76,13 @@ body.demo .sim{font-size:20px;padding:10px}
 .dbottom canvas{display:block;border-radius:8px}
 .dctl{display:flex;flex-direction:column;gap:10px;align-items:flex-end}
 .dctl button{font-size:16px;padding:10px 16px}
+
+/* Direct mode: live signal card and badge */
+.direct{font-size:11px;font-weight:700;color:#fbbf24;background:#3b2a07;border:1px solid #92400e;border-radius:20px;padding:4px 10px;margin-left:8px;max-width:340px}
+.lvrow{display:flex;align-items:center;gap:8px;margin:7px 0}
+.lvrow>span{width:24px;font-size:13px;color:#9fb3dc}
+.lvbar{position:relative;flex:1;height:20px;background:#0b1229;border:1px solid #2a3966;border-radius:4px;overflow:hidden}
+.lvfill{height:100%;width:0;background:#34d399}
+.lvfill.over{background:#f87171}
+.lvmark{position:absolute;top:0;bottom:0;width:2px;background:#fbbf24}
+.lvval{width:64px;text-align:right;font-variant-numeric:tabular-nums}
