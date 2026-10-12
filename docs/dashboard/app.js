@@ -384,7 +384,7 @@ function accStop(why) {
 function startAcc() {
   if (S.replay) { $("accState").textContent = "not available during replay"; return; }
   if (S.calIdx >= 0) { $("accState").textContent = "finish the calibration first"; return; }
-  if (!S.cal) { $("accState").textContent = "calibrate first (or start Simulation)"; return; }
+  if (!S.cal) { $("accState").textContent = "calibrate first"; return; }
   S.acc = { active: true, mode: $("accMode").value, sim: S.sim, idx: 0, rows: [], hist: [], rejected: 0, pending: null, done: false };
   accRefresh(); draw();
 }
