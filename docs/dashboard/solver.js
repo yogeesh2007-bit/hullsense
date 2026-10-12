@@ -5,9 +5,20 @@
   "use strict";
 
   const TICK_HZ = 80e6;               // ESP32 MCPWM capture clock (12.5 ns)
-  const PANEL = 0.300;                 // test wall is 300 x 300 mm
-  // Wall sensors P1..P4 (metres, origin at the panel's top-left corner)
-  const SENSORS = [[0.020, 0.020], [0.280, 0.020], [0.020, 0.280], [0.280, 0.280]];
+  // Rig geometry. Defaults match docs/dashboard/config.js; configure() overrides them.
+  const DEFAULTS = {
+    panelSize_m: 0.300,
+    sensors_m: [[0.020, 0.020], [0.280, 0.020], [0.020, 0.280], [0.280, 0.280]],  // P1..P4, origin top-left
+    coincidenceWindow_us: 1000,
+  };
+  let PANEL, SENSORS, COINCIDENCE_S;
+  function configure(cfg) {
+    PANEL = cfg.panelSize_m ?? DEFAULTS.panelSize_m;
+    SENSORS = (cfg.sensors_m ?? DEFAULTS.sensors_m).map((p) => [p[0], p[1]]);
+    COINCIDENCE_S = (cfg.coincidenceWindow_us ?? DEFAULTS.coincidenceWindow_us) / 1e6;
+    HS.PANEL = PANEL; HS.SENSORS = SENSORS;
+  }
+  const defaults = () => JSON.parse(JSON.stringify(DEFAULTS));
 
   // ---------- small dense linear algebra ----------
   function solveLinear(A, b) {           // Gaussian elimination with partial pivoting
@@ -106,7 +117,7 @@
   function triage(rise, opts = {}) {
     const wall = rise.slice(0, 4), bump = rise[4];
     const wallHits = wall.filter((r) => r > 0).length;
-    const maxSpread = (opts.maxSpreadSeconds || 1e-3) * TICK_HZ;  // 1 ms coincidence gate
+    const maxSpread = (opts.maxSpreadSeconds || COINCIDENCE_S) * TICK_HZ;  // coincidence gate
     if (bump > 0) {
       const firstWall = wall.filter((r) => r > 0).map((r) => ((r - bump) | 0));
       const bumperFirst = firstWall.length === 0 || Math.min(...firstWall) > 0;
@@ -163,7 +174,8 @@
     return (tau * Math.log(1 / (1 - frac))) / 60;
   }
 
-  const HS = { TICK_HZ, PANEL, SENSORS, calibrate, locate, triage, ticksToRelSeconds, totSum, fitEnergy, energyJ, fitBreach, flightMinutes, leastSquares };
+  const HS = { TICK_HZ, PANEL, SENSORS, configure, defaults, calibrate, locate, triage, ticksToRelSeconds, totSum, fitEnergy, energyJ, fitBreach, flightMinutes, leastSquares };
+  configure(root.HS_CONFIG || DEFAULTS);
   if (typeof module !== "undefined" && module.exports) module.exports = HS;
   else root.HS = HS;
 })(typeof window !== "undefined" ? window : globalThis);

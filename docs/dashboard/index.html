@@ -8,14 +8,18 @@
 </head>
 <body>
 <header>
-  <div class="brand">HULLSENSE <span>Module wall · panel A-03 · 300 × 300 mm</span></div>
+  <div class="brand">HULLSENSE <span id="panelLabel">Module wall · panel A-03 · 300 × 300 mm</span></div>
   <div class="controls">
     <button id="btnConnect">Connect node (USB)</button>
     <button id="btnSim" class="ghost">Simulation</button>
     <span id="status" class="pill">disconnected</span>
+    <button id="btnDemo" class="ghost">Demo mode (D)</button><button id="btnMute" class="ghost">🔇 Muted</button>
+    <span id="recBadge" class="rec hidden"></span>
   </div>
 </header>
 <div id="simBanner" class="sim hidden">SIMULATION MODE: synthetic data, not from hardware</div>
+
+<div id="replayBanner" class="replay hidden"></div>
 
 <main>
   <section class="card map">
@@ -45,7 +49,7 @@
       <div class="card">
         <h3>Calibration</h3>
         <p class="small">Tap each highlighted point once with a pen. Five taps fit the wave speed and the sensor offsets.</p>
-        <div class="row"><button id="btnCal">Start 5-tap calibration</button><span id="calState" class="small">not calibrated</span></div>
+        <div class="row"><button id="btnCal">Start 5-tap calibration</button><button id="btnCalClear" class="ghost">Clear calibration</button><span id="calState" class="small">not calibrated</span></div>
         <p class="small">Energy scale: drop a steel ball and enter its mass and height, then press <i>Add drop</i> right after the strike.</p>
         <div class="row"><input id="ballMass" type="number" value="8.4" step="0.1"> g <input id="ballH" type="number" value="20" step="1"> cm <button id="btnDrop" class="ghost">Add drop</button></div>
         <span id="energyState" class="small">energy: uncalibrated</span>
@@ -58,8 +62,120 @@
         <label>Leak trigger (Pa/s) <input id="setLeak" type="number" value="25" step="1"></label>
         <button id="btnAmbient" class="ghost">Record ambient (valve open)</button>
         <span id="ambState" class="small">ambient: from settled pressure</span>
+        <label>OpenRouter API key <input id="llmKey" type="password" autocomplete="off" style="width:130px"></label>
+        <label>Model <input id="llmModel" type="text" value="YOUR_MODEL_ID" style="width:130px"></label>
+        <span class="small">Key and model stay in this browser only.</span> <button id="btnLlmForget" class="ghost">Forget key</button>
       </div>
     </div>
+
+
+    <div class="card" id="recplay">
+      <h3>Record and replay</h3>
+      <div class="row">
+        <button id="btnRec">Record</button>
+        <button id="btnRecSave" class="ghost" disabled>Save recording</button>
+      </div>
+      <div class="row">
+        <button id="btnReplay" class="ghost">Load and replay</button>
+        <select id="replaySpeed"><option value="1">1x</option><option value="2">2x</option></select>
+        <button id="btnReplayStop" class="ghost" disabled>Stop</button>
+        <input id="replayFile" type="file" accept=".jsonl,.json,.txt" class="hidden">
+      </div>
+      <p class="small" id="recState">idle. Calibrate before you record, or record the calibration taps too.</p>
+    </div>
+
+    <div class="card" id="accuracy">
+      <h3>Accuracy test</h3>
+      <div class="row">
+        <select id="accMode"><option value="grid">Grid · 25 targets</option><option value="free">Free · click where you tapped</option></select>
+        <button id="btnAccStart">Start accuracy test</button>
+        <button id="btnAccSkip" class="ghost" disabled>Skip point</button>
+        <button id="btnAccRedo" class="ghost" disabled>Redo last point</button>
+        <button id="btnAccStop" class="ghost" disabled>Stop</button>
+      </div>
+      <p class="small" id="accState">idle</p>
+      <p class="small" id="accStats"></p>
+      <div class="row"><button id="btnAccCsv" class="ghost" disabled>Download CSV</button><button id="btnAccCopy" class="ghost" disabled>Copy summary</button></div>
+    </div>
+
+    <div class="card" id="tests">
+      <h3>Tests</h3>
+
+      <h4>1 · Shield vs wall</h4>
+      <div class="row"><button id="btnTriBumper" class="big">I will hit the BUMPER</button><button id="btnTriWall" class="big">I will hit the WALL</button></div>
+      <div class="row"><button id="btnTriStop" class="ghost">Disarm</button><button id="btnTriUndo" class="ghost">Undo last</button><button id="btnTriReset" class="ghost">Reset</button></div>
+      <p class="small" id="triState"></p>
+      <pre class="tlist" id="triList"></pre>
+      <div class="row"><b id="triSum"></b><button id="btnTriCopy" class="ghost">Copy</button></div>
+
+      <h4>2 · Noise</h4>
+      <div class="row"><label class="small">minutes <input id="noiMin" type="number" value="5" min="0.1" step="0.5"></label>
+        <button id="btnNoiStart">Start 5-minute noise test</button><button id="btnNoiStop" class="ghost" disabled>Cancel</button></div>
+      <p class="small" id="noiState"></p>
+      <div class="row"><b id="noiSum"></b><button id="btnNoiCopy" class="ghost">Copy</button></div>
+
+      <h4>3 · Soft vs hard</h4>
+      <p class="small">Tap the same spot softly 5 times, then switch to hard and tap it 5 times. Needs a calibration.</p>
+      <div class="row"><button id="btnShSoft" class="big">Soft taps</button><button id="btnShHard" class="big">Hard taps</button>
+        <button id="btnShStop" class="ghost">Stop</button><button id="btnShReset" class="ghost">Reset</button></div>
+      <p class="small" id="shState"></p>
+      <pre class="tlist" id="shInfo"></pre>
+      <div class="row"><b id="shSum"></b><button id="btnShCopy" class="ghost">Copy</button></div>
+
+      <h4>Results</h4>
+      <textarea id="tstResults" readonly rows="7"></textarea>
+      <div class="row"><button id="btnTstCopy">Copy all</button><button id="btnTstDownload" class="ghost">Download results.txt</button>
+        <button id="tstRefreshBtn" class="ghost">Refresh</button><span id="tstMsg" class="small"></span></div>
+    </div>
+
+    <div class="card" id="report">
+      <h3>Incident report</h3>
+      <div class="row"><button id="btnReport" disabled>Write incident report</button><span class="small" id="reportHint"></span></div>
+      <p class="small r" id="reportErr"></p>
+      <p class="small a" id="reportWarn"></p>
+      <div class="small" id="reportLabel"></div>
+      <pre class="tlist" id="reportText"></pre>
+    </div>
+
+    <details class="card" id="debug">
+      <summary><h3 style="display:inline">Debug · hardware team</h3></summary>
+      <p class="small" id="dbgSrc">No event yet</p>
+      <table>
+        <thead><tr><th>ch</th><th>fired</th><th>arrival (µs)</th><th>ToT (µs)</th><th>edges</th><th>edges/s</th></tr></thead>
+        <tbody id="dbgRows"></tbody>
+      </table>
+      <p class="small">Arrival is relative to the first sensor to fire (ticks ÷ 80). A channel turns red if it exceeds 5 edges/s with no strike in the last two heartbeats.</p>
+
+      <h4>Channel check</h4>
+      <div class="row"><button id="btnTest1" class="ghost">Test P1</button><button id="btnTest2" class="ghost">Test P2</button><button id="btnTest3" class="ghost">Test P3</button><button id="btnTest4" class="ghost">Test P4</button><button id="btnTest5" class="ghost">Test P5</button></div>
+      <p class="small" id="dbgTestMsg"></p>
+
+      <h4>Node status</h4>
+      <p class="small"><span id="dbgBmp">BMP280: unknown</span> · <span id="dbgPa">pressure: –</span></p>
+      <p class="small r hidden" id="dbgPWarn"></p>
+
+      <h4>Raw serial console</h4>
+      <pre id="dbgConsole"></pre>
+      <div class="row">
+        <button id="btnDbgPause" class="ghost">Pause</button>
+        <label class="small"><input id="dbgHideP" type="checkbox" checked> hide pressure lines</label>
+        <input id="dbgCmd" type="text" placeholder="PING or SYNC" style="width:110px"><button id="btnDbgSend" class="ghost">Send</button>
+        <span id="dbgCmdMsg" class="small"></span>
+      </div>
+    </details>
+
+    <details class="card" id="setup">
+      <summary><h3 style="display:inline">Setup · sensor positions</h3></summary>
+      <p class="small">Millimetres from the panel's top-left corner. Changing the geometry clears the calibration.</p>
+      <label>Panel size (mm) <input id="cfgPanel" type="number" step="1"></label>
+      <div class="cfgGrid">
+        <label>P1 x <input id="cfgP1x" type="number" step="1"></label><label>y <input id="cfgP1y" type="number" step="1"></label>
+        <label>P2 x <input id="cfgP2x" type="number" step="1"></label><label>y <input id="cfgP2y" type="number" step="1"></label>
+        <label>P3 x <input id="cfgP3x" type="number" step="1"></label><label>y <input id="cfgP3y" type="number" step="1"></label>
+        <label>P4 x <input id="cfgP4x" type="number" step="1"></label><label>y <input id="cfgP4y" type="number" step="1"></label>
+      </div>
+      <div class="row"><button id="btnCfgSave">Save</button><button id="btnCfgReset" class="ghost">Reset to defaults</button><span id="cfgState" class="small"></span></div>
+    </details>
 
     <div class="card">
       <h3>Event log</h3>
@@ -68,7 +184,21 @@
     </div>
   </section>
 </main>
+<div id="demo">
+  <div class="dleft"><canvas id="demoMap" width="560" height="560"></canvas></div>
+  <div class="dright">
+    <div id="dverdict" class="dverdict idle"><div id="dTitle" class="dtitle">WAITING FOR A STRIKE</div></div>
+    <div id="dLoc" class="dloc"></div>
+    <div id="dDetail" class="ddetail"></div>
+    <div id="dMiss" class="dmiss hidden"></div>
+    <div class="dbottom">
+      <div><div class="dcap">last 10 located strikes</div><canvas id="demoHeat" width="300" height="300"></canvas></div>
+      <div class="dctl"><button id="btnDemoMute" class="ghost">🔇 Muted</button><button id="btnDemoExit" class="ghost">Exit (Esc)</button><span id="demoRec" class="rec hidden"></span></div>
+    </div>
+  </div>
+</div>
 <footer>Team BYTEMELATER · SEDHACKS '26 · Rajalakshmi Engineering College · <a href="https://github.com/yogeesh2007-bit/hullsense">source</a> · <a href="../index.html">build brief</a></footer>
+<script src="config.js"></script>
 <script src="solver.js"></script>
 <script src="app.js"></script>
 </body>

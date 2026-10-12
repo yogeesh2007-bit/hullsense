@@ -32,3 +32,47 @@ table{width:100%;border-collapse:collapse;font-size:13px}td,th{padding:6px;borde
 .sens{display:flex;gap:8px;margin-top:10px}.sens div{flex:1;border-radius:6px;padding:6px;text-align:center;font-size:12px;border:1px solid #1f6b52;background:#0d2a22;color:#7ee2b8}
 .sens div.bad{border-color:#7f1d1d;background:#2a1220;color:#fca5a5}
 footer{padding:10px 22px 24px;color:#7f93bd;font-size:12px}footer a{color:#cae8ff}
+
+/* Setup panel */
+details.card summary { cursor: pointer; }
+.cfgGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 12px; margin: 8px 0; }
+.cfgGrid input, #cfgPanel { width: 80px; }
+
+/* Record and replay */
+.rec{background:#b91c1c;color:#fff;font-weight:700;font-size:12px;padding:4px 10px;border-radius:20px;margin-left:8px}
+.replay{background:#1d4ed8;color:#fff;text-align:center;font-weight:800;font-size:22px;padding:14px;letter-spacing:1px}
+
+/* Debug panel */
+#debug h4{margin:12px 0 4px;font-size:13px;color:#9fb3dc}
+#debug tr.first td{background:#1e3a8a;color:#fff}
+#debug tr.noisy td{color:#f87171;font-weight:700}
+#dbgConsole{height:150px;overflow:auto;margin:6px 0;padding:6px;background:#0b1229;border:1px solid #2a3966;border-radius:6px;font:11px/1.35 monospace;white-space:pre-wrap;word-break:break-all}
+
+/* Guided tests */
+#tests h4{margin:14px 0 4px;font-size:13px;color:#9fb3dc}
+button.big{font-size:16px;padding:12px 18px}
+button.on{outline:2px solid #fbbf24}
+.tlist{max-height:120px;overflow:auto;margin:6px 0;padding:6px;background:#0b1229;border:1px solid #2a3966;border-radius:6px;font:12px/1.4 monospace;white-space:pre-wrap}
+#tstResults{width:100%;box-sizing:border-box;background:#0b1229;color:#e5ecf8;border:1px solid #2a3966;border-radius:6px;padding:8px;font:12px/1.4 monospace}
+
+/* Demo mode (projector) */
+#demo{display:none}
+body.demo header,body.demo main,body.demo footer{display:none}
+body.demo #demo{display:grid;grid-template-columns:auto 1fr;gap:24px;padding:16px 24px;align-items:start}
+body.demo .sim{font-size:20px;padding:10px}
+.dleft canvas{display:block;border-radius:10px}
+.dright{display:flex;flex-direction:column;gap:14px;min-width:0}
+.dverdict{border-radius:16px;padding:3vh 2vw;text-align:center;border:4px solid #2a3966;background:#0d1430}
+.dtitle{font-size:clamp(40px,7.5vw,150px);font-weight:900;letter-spacing:2px;line-height:1.05}
+.dverdict.shield{background:#064e3b;border-color:#34d399;color:#d1fae5}
+.dverdict.wall{background:#78350f;border-color:#fbbf24;color:#fef3c7}
+.dverdict.breach{background:#7f1d1d;border-color:#f87171;color:#fee2e2;animation:dflash 1s infinite}
+@keyframes dflash{50%{filter:brightness(1.6)}}
+.dloc{font-size:clamp(28px,4.5vw,90px);font-weight:800;text-align:center;font-variant-numeric:tabular-nums}
+.ddetail{font-size:clamp(18px,2.4vw,48px);text-align:center;color:#9fb3dc;min-height:1.2em}
+.dmiss{font-size:clamp(20px,2.8vw,56px);font-weight:800;text-align:center;color:#f472b6}
+.dbottom{display:flex;gap:24px;align-items:flex-end;justify-content:space-between}
+.dcap{font-size:13px;color:#9fb3dc;margin-bottom:4px}
+.dbottom canvas{display:block;border-radius:8px}
+.dctl{display:flex;flex-direction:column;gap:10px;align-items:flex-end}
+.dctl button{font-size:16px;padding:10px 16px}
