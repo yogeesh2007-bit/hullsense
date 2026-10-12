@@ -531,7 +531,7 @@ function startReplay(lines, meta, fileTime, bad) {
   }
   const label = new Date(meta && meta.recorded ? meta.recorded : fileTime).toLocaleString();
   const anySim = lines.some((l) => l.sim);
-  S.replay = { lines, i: 0, ms0: lines[0].ms, t0: performance.now(), speed: parseFloat($("replaySpeed").value) || 1, label, simNote: anySim ? " · includes SIMULATED data" : "", timer: null };
+  S.replay = { lines, i: 0, ms0: lines[0].ms, t0: performance.now(), speed: parseFloat($("replaySpeed").value) || 1, label, simNote: anySim ? " · includes SIMULATED data" : "", timer: null, args: [lines, meta, fileTime, bad] };
   S.replayView = true;
   $("replayBanner").textContent = `REPLAY of recorded data from ${label}, not live${S.replay.simNote}`;
   $("replayBanner").classList.remove("hidden");
@@ -553,7 +553,10 @@ function replayTick() {
       if (m.t === "ui") { if (m.act === "calstart") startCalibration(); } else handleMessage(m);
     } catch (err) { console.warn("replay: skipped a line", err.message); }
   }
-  if (R.i >= R.lines.length) { endReplay("finished"); return; }
+  if (R.i >= R.lines.length) {
+    if ($("replayLoop").checked) { endReplay("looping"); startReplay(...R.args); return; }   // Loop: start the same recording again
+    endReplay("finished"); return;
+  }
   $("recState").textContent = `replaying ${Math.round((100 * R.i) / R.lines.length)}% at ${R.speed}x`;
   R.timer = setTimeout(replayTick, Math.max(1, (R.lines[R.i].ms - now) / R.speed));
 }
